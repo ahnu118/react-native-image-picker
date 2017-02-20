@@ -27,6 +27,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
+        // get version name from package.json version
         versionName computeVersionName()
     }
     lintOptions {

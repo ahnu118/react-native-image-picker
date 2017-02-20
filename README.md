@@ -8,7 +8,7 @@ iOS | Android
 <img title="iOS" src="https://github.com/marcshilling/react-native-image-picker/blob/master/images/ios-image.png"> | <img title="Android" src="https://github.com/marcshilling/react-native-image-picker/blob/master/images/android-image.png">
 
 #### _Before you open an issue_
-This library started as a basic bridge of the native iOS image picker, and I want to keep it that way. As such, functionality beyond what the native `UIImagePickerController` supports will not be supported here. **Multiple image selection, more control over the crop tool, and landscape support** are things missing from the native iOS functionality - **not issues with my library**. If you need these things, [react-native-image-crop-picker](https://github.com/ivpusic/react-native-image-crop-picker) might be a better choice for you.   
+This library started as a basic bridge of the native iOS image picker, and I want to keep it that way. As such, functionality beyond what the native `UIImagePickerController` supports will not be supported here. **Multiple image selection, more control over the crop tool, and landscape support** are things missing from the native iOS functionality - **not issues with my library**. If you need these things, [react-native-image-crop-picker](https://github.com/ivpusic/react-native-image-crop-picker) might be a better choice for you.    
 
 ## Table of contents
 - [Install](#install)
@@ -19,15 +19,17 @@ This library started as a basic bridge of the native iOS image picker, and I wan
 
 ## Install
 
-### NOTE: THIS PACKAGE IS NOW BUILT FOR REACT NATIVE 0.40 OR GREATER! IF YOU NEED TO SUPPORT REACT NATIVE < 0.40, YOU SHOULD INSTALL THIS PACKAGE `@0.24`
-
 `npm install react-native-image-picker@latest --save`
 
 ### Automatic Installation
 
-`react-native link`
+**React Native >= 0.29**
+`$react-native link`
 
-IMPORTANT NOTE: You'll still need to perform step 4 for iOS and step 3 for Android of the manual instructions below.
+**React Native < 0.29**
+`$rnpm link`
+
+Note: On iOS, you'll still need to perform step 4 of the manual instructions below.
 
 ### Manual Installation
 
@@ -36,48 +38,63 @@ IMPORTANT NOTE: You'll still need to perform step 4 for iOS and step 3 for Andro
 1. In the XCode's "Project navigator", right click on your project's Libraries folder ➜ `Add Files to <...>`
 2. Go to `node_modules` ➜ `react-native-image-picker` ➜ `ios` ➜ select `RNImagePicker.xcodeproj`
 3. Add `RNImagePicker.a` to `Build Phases -> Link Binary With Libraries`
-4. For iOS 10+, Add the `NSPhotoLibraryUsageDescription`, `NSCameraUsageDescription`, and `NSMicrophoneUsageDescription` (if allowing video) keys to your `Info.plist` with strings describing why your app needs these permissions
+4. For iOS 10+, Add the `NSPhotoLibraryUsageDescription` and `NSCameraUsageDescription` keys to your `Info.plist` with strings describing why your app needs these permissions
 5. Compile and have fun
 
 #### Android
-1. Add the following lines to `android/settings.gradle`:
+```gradle
+// file: android/settings.gradle
+...
 
-    ```gradle
-    include ':react-native-image-picker'
-    project(':react-native-image-picker').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-image-picker/android')
-    ```
-2. Add the compile line to the dependencies in `android/app/build.gradle`:
+include ':react-native-image-picker'
+project(':react-native-image-picker').projectDir = new File(settingsDir, '../node_modules/react-native-image-picker/android')
+```
+```gradle
+// file: android/app/build.gradle
+...
 
-    ```gradle
-    dependencies {
-        compile project(':react-native-image-picker')
-    }
-    ```
-3. Add the required permissions in `AndroidManifest.xml`:
+dependencies {
+    ...
+    compile project(':react-native-image-picker')
+}
+```
+```xml
+<!-- file: android/app/src/main/AndroidManifest.xml -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.myApp">
 
-    ```xml
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- add following permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    ```
-4. Add the import and link the package in `MainApplication.java`:
-
-    ```java
-    import com.imagepicker.ImagePickerPackage; // <-- add this import
-
-    public class MainApplication extends Application implements ReactApplication {
-        @Override
-        protected List<ReactPackage> getPackages() {
-            return Arrays.<ReactPackage>asList(
-                new MainReactPackage(),
-                new ImagePickerPackage() // <-- add this line
-            );
-        }
-    }
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <!-- -->
+    ...
 ```
+```java
+// file: android/app/src/main/java/com/<...>/MainApplication.java
+...
 
+import com.imagepicker.ImagePickerPackage; // <-- add this import
+
+public class MainApplication extends Application implements ReactApplication {
+    @Override
+    protected List<ReactPackage> getPackages() {
+        return Arrays.<ReactPackage>asList(
+            new MainReactPackage(),
+            new ImagePickerPackage() // <-- add this line
+        );
+    }
+...
+}
+
+```
 ## Usage
 
 ```javascript
+var Platform = require('react-native').Platform;
 var ImagePicker = require('react-native-image-picker');
 
 // More info on all the options is below in the README...just some common use cases shown here
@@ -109,10 +126,15 @@ ImagePicker.showImagePicker(options, (response) => {
     console.log('User tapped custom button: ', response.customButton);
   }
   else {
-    let source = { uri: response.uri };
+    // You can display the image using either data...
+    const source = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true};
 
-    // You can also display the image using data:
-    // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+    // or a reference to the platform specific asset location
+    if (Platform.OS === 'ios') {
+      const source = {uri: response.uri.replace('file://', ''), isStatic: true};
+    } else {
+      const source = {uri: response.uri, isStatic: true};
+    }
 
     this.setState({
       avatarSource: source
@@ -176,7 +198,6 @@ key | iOS | Android | Description
 ------ | ---- | ------- | ----------------------
 didCancel | OK | OK | Informs you if the user cancelled the process
 error | OK | OK | Contains an error message, if there is one
-customButton | OK | OK | If the user tapped one of your custom buttons, contains the name of it
 data | OK | OK | The base64 encoded image data (photos only)
 uri | OK | OK | The uri to the local file asset on the device (photo or video)
 origURL | OK | - | The URL of the original asset in photo library, if it exists
