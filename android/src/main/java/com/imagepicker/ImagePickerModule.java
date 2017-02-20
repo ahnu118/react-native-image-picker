@@ -509,8 +509,8 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
     if (cursor == null) { // Source is Dropbox or other similar local file path
       result = uri.getPath();
     }
-    else if(cursor.getColumnCount()==0){ 
-      cursor.close(); 
+    else if(cursor.getColumnCount()==0){
+      cursor.close();
       result = uri.getPath();
     }
      else {
