@@ -5,9 +5,9 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/ahnu118/react-native-image-picker"
   s.authors      = { 'ahnu118' => '596090355@qq.com' }
   s.summary      = "A React Native module that allows you to use the native UIImagePickerController UI to select a photo from the device library or directly from the camera"
-  s.source       = { :git => "https://github.com/ahnu118/react-native-image-picker" }
+  s.source       = { :git => "https://github.com/ahnu118/react-native-image-picker.git" , :tag => "v#{s.version}" }
   s.source_files  = "ios/*.{h,m}"
-  
+
   s.platform     = :ios, "7.0"
   s.dependency 'React'
 end
