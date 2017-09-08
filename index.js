@@ -19,12 +19,5 @@ module.exports = {
       options = {};
     }
     return ImagePickerManager.showImagePicker({...DEFAULT_OPTIONS, ...options}, callback)
-  },
-  base64: function base64(options, callback) {
-    if (typeof options === 'function') {
-      callback = options;
-      options = {};
-    }
-    return ImagePickerManager.base64(options, callback)
   }
 }
