@@ -35,8 +35,8 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
 
 RCT_EXPORT_METHOD(base64:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback)
 {
-    NSString *imageUrl = options.uri;
-    UIImage *originalImage = [[[UIImage alloc] initWithContentsOfFile:imageUrl];
+    NSString *imageUrl = [options objectForKey:@"uri"];
+    UIImage *originalImage = [[UIImage alloc] initWithContentsOfFile:imageUrl];
     NSString *base64 = [UIImageJPEGRepresentation(originalImage, 0.3) base64Encoding];
     callback(@[@{@"base64": base64}]);
 }
