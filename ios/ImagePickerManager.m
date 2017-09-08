@@ -33,6 +33,15 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
     [self launchImagePicker:RNImagePickerTargetLibrarySingleImage options:options];
 }
 
+RCT_EXPORT_METHOD(base64:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback)
+{
+    NSString *imageUrl = options.uri;
+    UIImage *originalImage = [[[UIImage alloc] initWithContentsOfFile:imageUrl];
+    NSString *base64 = [UIImageJPEGRepresentation(originalImage, 0.3) base64Encoding];
+    callback(@[@{@"base64": base64}]);
+}
+
+
 RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback)
 {
     self.callback = callback; // Save the callback so we can use it from the delegate methods
