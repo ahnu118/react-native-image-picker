@@ -188,6 +188,18 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
     dialog.show();
   }
 
+  @ReactMethod
+  public void base64(ReadableMap options, final Callback callback)
+  {
+    String imageUrl = options.getString("uri");
+    Bitmap bitmap = ImageUtils.getSmallBitmap(imageUrl);
+    ByteArrayOutputStream baos = ImageUtils.calculateQuality(bitmap, 200);
+    String bitmapString = Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
+    response = Arguments.createMap();
+    response.putString("base64",bitmapString);
+    callback.invoke(response);
+  }
+
   // NOTE: Currently not reentrant / doesn't support concurrent requests
   @ReactMethod
   public void launchCamera(final ReadableMap options, final Callback callback) {
