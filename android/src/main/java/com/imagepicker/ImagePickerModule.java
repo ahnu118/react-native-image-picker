@@ -189,9 +189,12 @@ public class ImagePickerModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void base64(ReadableMap options, final Callback callback)
+  public void base64(final ReadableMap options, final Callback callback)
   {
     String imageUrl = options.getString("uri");
+    if(imageUrl.startsWith("file")){
+        imageUrl = imageUrl.substring(7);
+    }
     Bitmap bitmap = ImageUtils.getSmallBitmap(imageUrl);
     ByteArrayOutputStream baos = ImageUtils.calculateQuality(bitmap, 200);
     String bitmapString = Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
