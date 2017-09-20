@@ -36,7 +36,7 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
 RCT_EXPORT_METHOD(base64:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback)
 {
     NSString *imageUrl = [options objectForKey:@"uri"];
-    if([imageUrl rangeOfString:@"file"].location != NSNotFound ){
+    if([imageUrl hasPrefix:@"file"]){
         imageUrl = [imageUrl substringFromIndex:7];
         UIImage *originalImage = [[UIImage alloc] initWithContentsOfFile:imageUrl];
         if(!originalImage){
@@ -44,7 +44,7 @@ RCT_EXPORT_METHOD(base64:(NSDictionary *)options callback:(RCTResponseSenderBloc
         }
         NSString *base64 = [UIImageJPEGRepresentation(originalImage, 0.3) base64Encoding];
         callback(@[@{@"base64": base64}]);
-    } else if([imageUrl rangeOfString:@"assets-library"].location != NSNotFound){
+    } else if([imageUrl hasPrefix:@"assets-library"]){
         NSURL *url                                  = [[NSURL alloc] initWithString:imageUrl];
         ALAssetsLibrary *library                    = [[ALAssetsLibrary alloc] init];
         [library assetForURL:url resultBlock:^(ALAsset *asset)
