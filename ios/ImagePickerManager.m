@@ -38,14 +38,35 @@ RCT_EXPORT_METHOD(base64:(NSDictionary *)options callback:(RCTResponseSenderBloc
     NSString *imageUrl = [options objectForKey:@"uri"];
     if([imageUrl rangeOfString:@"file"].location != NSNotFound ){
         imageUrl = [imageUrl substringFromIndex:7];
+        UIImage *originalImage = [[UIImage alloc] initWithContentsOfFile:imageUrl];
+        if(!originalImage){
+            callback(@[[NSNull null]]);
+        }
+        NSString *base64 = [UIImageJPEGRepresentation(originalImage, 0.3) base64Encoding];
+        callback(@[@{@"base64": base64}]);
+    } else if([imageUrl rangeOfString:@"assets-library"].location != NSNotFound){
+        NSURL *url                                  = [[NSURL alloc] initWithString:imageUrl];
+        ALAssetsLibrary *library                    = [[ALAssetsLibrary alloc] init];
+        [library assetForURL:url resultBlock:^(ALAsset *asset)
+         {
+             ALAssetRepresentation *representation  = [asset defaultRepresentation];
+             CGImageRef imageRef                        = [representation fullScreenImage];
+             NSData *imagePngRep                        = UIImagePNGRepresentation([UIImage imageWithCGImage:imageRef]);
+             UIImage *imageUI                       = [UIImage imageWithData:imagePngRep];
+             NSData *ImageData                      = UIImagePNGRepresentation(imageUI);
+             NSString *base64Encoded                    = [ImageData base64EncodedStringWithOptions:0];
+             
+             callback(@[@{@"base64": base64Encoded}]);
+         }
+                failureBlock:^(NSError *error)
+         {
+             callback(@[@{@"base64": @""}]);
+
+         }];
     }
-    UIImage *originalImage = [[UIImage alloc] initWithContentsOfFile:imageUrl];
-    if(!originalImage){
-        callback(@[[NSNull null]]);
-    }
-    NSString *base64 = [UIImageJPEGRepresentation(originalImage, 0.3) base64Encoding];
-    callback(@[@{@"base64": base64}]);
+
 }
+
 
 
 RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback)
