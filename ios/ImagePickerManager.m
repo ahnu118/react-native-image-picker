@@ -51,10 +51,10 @@ RCT_EXPORT_METHOD(base64:(NSDictionary *)options callback:(RCTResponseSenderBloc
          {
              ALAssetRepresentation *representation  = [asset defaultRepresentation];
              CGImageRef imageRef                        = [representation fullScreenImage];
-             NSData *imagePngRep                        = UIImagePNGRepresentation([UIImage imageWithCGImage:imageRef]);
-             UIImage *imageUI                       = [UIImage imageWithData:imagePngRep];
-             NSData *ImageData                      = UIImagePNGRepresentation(imageUI);
-             NSString *base64Encoded                    = [ImageData base64EncodedStringWithOptions:0];
+             NSData *imagePngRep                        = UIImagePNGRepresentation([UIImage imageWithCGImage:imageRef],0.2);
+             //UIImage *imageUI                       = [UIImage imageWithData:imagePngRep];
+             //NSData *ImageData                      = UIImagePNGRepresentation(imageUI,0.3);
+             NSString *base64Encoded                    = [imagePngRep base64EncodedStringWithOptions:0];
              
              callback(@[@{@"base64": base64Encoded}]);
          }
