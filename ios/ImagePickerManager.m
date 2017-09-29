@@ -63,6 +63,13 @@ RCT_EXPORT_METHOD(base64:(NSDictionary *)options callback:(RCTResponseSenderBloc
              callback(@[@{@"base64": @""}]);
 
          }];
+    }else{
+        UIImage *originalImage = [[UIImage alloc] initWithContentsOfFile:imageUrl];
+        if(!originalImage){
+            callback(@[[NSNull null]]);
+        }
+        NSString *base64 = [UIImageJPEGRepresentation(originalImage, 0.3) base64Encoding];
+        callback(@[@{@"base64": base64}]);
     }
 
 }
