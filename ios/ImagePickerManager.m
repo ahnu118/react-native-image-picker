@@ -33,6 +33,44 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
     [self launchImagePicker:RNImagePickerTargetLibrarySingleImage options:options];
 }
 
+RCT_EXPORT_METHOD(convertMovToMp4:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback)
+{
+    self.callback = callback;
+    NSURL *videoURL =[NSURL fileURLWithPath:[options objectForKey:@"uri"]] ;
+    AVURLAsset *avAsset = [AVURLAsset URLAssetWithURL:videoURL options:nil];
+    NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
+    if ([compatiblePresets containsObject:AVAssetExportPresetLowQuality])
+    {
+        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc]initWithAsset:avAsset presetName:AVAssetExportPresetLowQuality];
+        NSDateFormatter *formater=[[NSDateFormatter alloc] init];//用时间给文件全名
+        [formater setDateFormat:@"yyyyMMddHHmmss"];
+        NSString *resultPath=[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0] stringByAppendingFormat:@"/output-%@.mp4", [formater stringFromDate:[NSDate date]]];
+        NSLog(@"%@---------",resultPath);
+        exportSession.outputURL = [NSURL fileURLWithPath:resultPath];
+        exportSession.outputFileType = AVFileTypeMPEG4;
+        CMTime start = CMTimeMakeWithSeconds(1.0, 600);
+        CMTime duration = CMTimeMakeWithSeconds(10.0, 600);
+        CMTimeRange range = CMTimeRangeMake(start, duration);
+        exportSession.timeRange = range;
+        [exportSession exportAsynchronouslyWithCompletionHandler:^{
+            switch ([exportSession status]) {
+                case AVAssetExportSessionStatusFailed:
+                    callback(@[@{@"uri": @""}]);
+                    break;
+                case AVAssetExportSessionStatusCompleted:
+                    callback(@[@{@"uri": resultPath}]);
+                    break;
+                case AVAssetExportSessionStatusCancelled:
+                    callback(@[@{@"uri": @""}]);
+                    break;
+                default:
+                    callback(@[@{@"uri": @""}]);
+                    break;
+            }
+        }];
+    }
+}
+
 RCT_EXPORT_METHOD(base64:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback)
 {
     NSString *imageUrl = [options objectForKey:@"uri"];

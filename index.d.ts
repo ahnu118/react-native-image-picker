@@ -56,6 +56,8 @@ declare module "react-native-image-picker" {
         static launchCamera(options: Options, callback: (response: Response) => void): void;
         static launchImageLibrary(options: Options, callback: (response: Response) => void): void;
         static base64(options: Object, callback: (response: Response) => void): void;
+        // only ios
+        static convertMovToMp4(options: Object, callback: (response: Response) => void): void;
     }
 
 }
